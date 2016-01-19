@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-Vendor: Athento
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Bundle-Version: 1.0
+Bundle-Name: athento-nx-security-xss-prevention
+Nuxeo-Component: OSGI-INF/user-manager-override.xml
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: athento-nx-security-xss-prevention
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+
