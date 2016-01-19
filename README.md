@@ -1,37 +1,26 @@
-# nuxeo-field-validator-plugin
+# athento-nx-security-xss-prevention
+
+## For versions
+6.0
 
 ## Synopsis
 
-This Nuxeo plugin implements some common field validators for forms. It must be used from another plugin (the one you are developing).
+This plugin prevents XSS store attack vector when creating/editting a user and when this data is rendered in the suggestion-box.
 
-Validations available: 
-- validateEmailAddress
-- validateHomePhoneNumber (must begin with 8 or 9)
-- validateMobilePhoneNumber (must begin with 6 or 7)
-- validateNIF (also checks for the correct letter) (also valid for NIE)
-- validateNIFLazy (just check for 8 digits and a letter)
+## Steps to XSS attack
 
-## Code Example
-
-Use it in your contribution (extensions.xml):
-```xml
-	<widget name="EmailAddress" type="text">
-		<labels>
-			<label mode="any">label.email</label>
-		</labels>
-		<translated>true</translated>
-		<fields>
-			<field>MyApp:EmailAddress</field>
-		</fields>
-		<properties widgetMode="edit">
-			<property name="validator">#{bFieldValidator.validateEmailAddress}</property>
-		</properties>
-	</widget>
+1 Create a user using REST API (also using UI form)
+```{r, engine='bash', count_lines}
+curl -X POST -H "Content-Type: application/json" -u Administrator:Administrator -d '{ "entity-type": "user", "id":"xssuser", "properties":{"username":"xssuser", "email":"xss@athento.com", "lastName":"XSS attack!", "firstName":"<script>alert(\"You have been hacked!\");</script>", "password":"xsspasswd" } }' http://localhost:8080/nuxeo/api/v1/user
 ```
 
-## Motivation
+2 This will result in this situation
+![Alt text](http://oi64.tinypic.com/2cwkhma.jpg "Dangerous user created")
 
-There are a lot of common validations across any web application that could be centralized in one plugin to contribute to Nuxeo platform.
+
+3 When you try to search the user using the suggestion box (on the top-right corner of the page) you'll get the following message:
+![Alt text](http://oi68.tinypic.com/ivhg6t.jpg "XSS attack success")
+
 
 ## Installation
 
