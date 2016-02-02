@@ -5,10 +5,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.athento.nuxeo.exceptions.UserInfoValidationException;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.platform.usermanager.UserManagerImpl;
 import org.nuxeo.ecm.platform.usermanager.exceptions.UserAlreadyExistsException;
-
 /**
  * @author athento
  *
@@ -16,28 +17,30 @@ import org.nuxeo.ecm.platform.usermanager.exceptions.UserAlreadyExistsException;
 public class AthentoUserManagerImpl extends UserManagerImpl {
 
 	private static final long serialVersionUID = 1L;
-	public static final String expression = "^[\\p{L} .'-]+$";
+	public static final String expression = "^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$";
+	public static final String FIRSTNAME = "firstName";
+	public static final String LASTNAME = "lastName";
 
 	@Override
 	public DocumentModel createUser(DocumentModel userModel,
 			DocumentModel context) throws UserAlreadyExistsException {
-		Object userFirstName = userModel.getProperty(userSchemaName, "firstName");
-		Object userLastName = userModel.getProperty(userSchemaName, "lastName");
-		checkUserData(userFirstName, AthentoUserManagerImpl.expression);
-		checkUserData(userLastName, AthentoUserManagerImpl.expression);
+		Object userFirstName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.FIRSTNAME);
+		Object userLastName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.LASTNAME);
+		checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
+		checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
 		return super.createUser(userModel, context);
 	}
 
 	@Override
 	public void updateUser(DocumentModel userModel, DocumentModel context) {
-		Object userFirstName = userModel.getProperty(userSchemaName, "firstName");
-		Object userLastName = userModel.getProperty(userSchemaName, "lastName");
-		checkUserData(userFirstName, AthentoUserManagerImpl.expression);
-		checkUserData(userLastName, AthentoUserManagerImpl.expression);
+		Object userFirstName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.FIRSTNAME);
+		Object userLastName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.LASTNAME);
+		checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
+		checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
 		super.updateUser(userModel, context);
 	}
 
-	private void checkUserData(Object value, String expression) {
+	private void checkUserData(String field, Object value, String expression) {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Validating text: " + value);
 		}
@@ -46,7 +49,7 @@ public class AthentoUserManagerImpl extends UserManagerImpl {
 			return;
 		} else {
 			_log.error("Value ["+value+"] not valid for expression ["+expression+"]");
-			throw new UserAlreadyExistsException();
+			throw new UserInfoValidationException ("Invalid value for " + field);
 		}
 	}
 
