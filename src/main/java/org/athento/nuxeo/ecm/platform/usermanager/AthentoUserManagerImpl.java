@@ -26,8 +26,12 @@ public class AthentoUserManagerImpl extends UserManagerImpl {
 			DocumentModel context) throws UserAlreadyExistsException {
 		Object userFirstName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.FIRSTNAME);
 		Object userLastName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.LASTNAME);
-		checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
-		checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
+		if (userFirstName != null && !userFirstName.toString().isEmpty()) {
+			checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
+		}
+		if (userLastName != null && !userLastName.toString().isEmpty()) {
+			checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
+		}
 		return super.createUser(userModel, context);
 	}
 
@@ -35,8 +39,12 @@ public class AthentoUserManagerImpl extends UserManagerImpl {
 	public void updateUser(DocumentModel userModel, DocumentModel context) {
 		Object userFirstName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.FIRSTNAME);
 		Object userLastName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.LASTNAME);
-		checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
-		checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
+		if (userFirstName != null && !userFirstName.toString().isEmpty()) {
+			checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
+		}
+		if (userLastName != null && !userLastName.toString().isEmpty()) {
+			checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
+		}
 		super.updateUser(userModel, context);
 	}
 
