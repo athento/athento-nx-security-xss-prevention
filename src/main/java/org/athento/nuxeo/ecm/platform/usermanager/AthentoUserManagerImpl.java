@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.athento.nuxeo.exceptions.UserInfoValidationException;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.platform.usermanager.UserManagerImpl;
 import org.nuxeo.ecm.platform.usermanager.exceptions.UserAlreadyExistsException;
 /**
@@ -24,31 +25,39 @@ public class AthentoUserManagerImpl extends UserManagerImpl {
 	@Override
 	public DocumentModel createUser(DocumentModel userModel,
 			DocumentModel context) throws UserAlreadyExistsException {
-		Object userFirstName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.FIRSTNAME);
-		Object userLastName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.LASTNAME);
-		if (userFirstName != null && !userFirstName.toString().isEmpty()) {
-			checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
-		}
-		if (userLastName != null && !userLastName.toString().isEmpty()) {
-			checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
-		}
+		checkUserData(userModel);
 		return super.createUser(userModel, context);
 	}
 
 	@Override
 	public void updateUser(DocumentModel userModel, DocumentModel context) {
-		Object userFirstName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.FIRSTNAME);
-		Object userLastName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.LASTNAME);
-		if (userFirstName != null && !userFirstName.toString().isEmpty()) {
-			checkUserData(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
-		}
-		if (userLastName != null && !userLastName.toString().isEmpty()) {
-			checkUserData(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
-		}
+		checkUserData(userModel);
 		super.updateUser(userModel, context);
 	}
 
-	private void checkUserData(String field, Object value, String expression) {
+	private void checkUserData(DocumentModel userModel) {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Checking user model: " + userModel);
+		}
+		try {
+			Object userFirstName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.FIRSTNAME);
+			if (userFirstName != null && !userFirstName.toString().isEmpty()) {
+				checkField(AthentoUserManagerImpl.FIRSTNAME, userFirstName, AthentoUserManagerImpl.expression);
+			}
+		} catch (PropertyNotFoundException e) {
+			_log.warn(e.getMessage());
+		}
+		try {
+			Object userLastName = userModel.getProperty(userSchemaName, AthentoUserManagerImpl.LASTNAME);
+			if (userLastName != null && !userLastName.toString().isEmpty()) {
+				checkField(AthentoUserManagerImpl.LASTNAME, userLastName, AthentoUserManagerImpl.expression);
+			}
+		} catch (PropertyNotFoundException e) {
+			_log.warn(e.getMessage());
+		}
+	}
+	
+	private void checkField(String field, Object value, String expression) {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Validating text: " + value);
 		}
